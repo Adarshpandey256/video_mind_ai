@@ -1,0 +1,41 @@
+# =============================================================================
+# VideoMind AI - dependency plan for the remaining steps
+#
+# Steps 2, 4 and 5 are INSTALLED; their packages live in requirements.txt. This
+# file is kept as the record of the dependency decisions made across the stages.
+# =============================================================================
+
+# --- Step 2 (DONE - see requirements.txt) -------------------------------------
+# openai-whisper==20250625   speech-to-text with timestamped segments
+# torch==2.14.1              CPU wheel; swap for the CUDA wheel to use a GPU
+# yt-dlp==2026.8.19          URL ingestion for supported public platforms
+# FFmpeg/FFprobe are external binaries, not Python packages. Verify with:
+#   ffmpeg -version  /  ffprobe -version
+
+# --- Step 3: summarisation ----------------------------------------------------
+# No new package is strictly required: summaries use the NVIDIA model through the
+# existing openai SDK client in src/services/llm_service.py.
+
+# --- Step 4 (DONE - see requirements.txt) ------------------------------------
+# langchain-core==1.6.12        prompts, runnables, Embeddings interface
+# langchain-chroma==1.1.0       Chroma VectorStore wrapper
+# chromadb==1.5.9               persistent local vector database
+# sentence-transformers==6.1.0  local embedding model (all-MiniLM-L6-v2)
+# Note: the "langchain" meta-package and langchain-community are not needed.
+# Step 4 imports only langchain_core and langchain_chroma.
+
+# --- Step 5 (DONE - see requirements.txt) ------------------------------------
+# reportlab==5.1.0      PDF via the Platypus layout engine
+# python-docx==1.2.0    DOCX
+# openpyxl==3.1.5       XLSX
+# python-pptx==1.0.2    PPTX
+# pypdf==6.21.2         test-only: reopens generated PDFs
+# TXT, Markdown, JSON, HTML and CSV exports use the standard library only.
+
+# --- Notes --------------------------------------------------------------------
+# 1. Install one implementation per capability: do not add a second vector store
+#    or a second embedding stack unless there is a concrete requirement.
+# 2. ChromaDB and sentence-transformers download model/data files on first use;
+#    keep them out of repository history (chroma_data/ is already git-ignored).
+# 3. After installing a block, run "pip freeze > environment.lock.txt" if you want
+#    a fully reproducible snapshot of resolved transitive versions.

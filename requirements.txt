@@ -1,0 +1,62 @@
+# VideoMind AI - installed dependencies (Windows and cross-platform)
+#
+# Install into the virtual environment:
+#   py -3.12 -m venv .venv
+#   .venv\Scripts\activate
+#   python -m pip install --upgrade pip
+#   pip install -r requirements.txt
+#
+# Versions below are the exact resolved versions of the Python 3.12 environment
+# used to develop and test Steps 1-5.
+#
+# FFmpeg is NOT a Python package. It is an external executable required by both
+# audio extraction (Step 2, Feature D) and openai-whisper. Installing the packages
+# below does not install FFmpeg; see the README "Step 2" section for setup.
+
+# --- Core application ---------------------------------------------------------
+streamlit==1.65.0
+python-dotenv==1.2.4
+pydantic==2.14.1
+pydantic-settings==2.15.0
+
+# --- NVIDIA (OpenAI-compatible) provider --------------------------------------
+openai==3.29.0
+
+# --- Step 3: NVIDIA Nemotron summarisation ------------------------------------
+# Deliberately no new packages: summarisation reuses the OpenAI SDK above and the
+# Pydantic models in src/models/summary_schemas.py, and tiktoken (already pulled in by
+# openai-whisper) is used for token estimates when it is importable.
+
+# --- Step 2: media ingestion + local Whisper transcription --------------------
+# openai-whisper pulls in torch, torchaudio, numpy and tiktoken transitively.
+# The pinned torch build below is the CPU wheel (2.14.1+cpu); swap it for the
+# matching CUDA wheel if you want GPU transcription (see README).
+openai-whisper==20250625
+torch==2.14.1
+yt-dlp==2026.8.19
+
+# --- Step 4: retrieval augmented chat ----------------------------------------
+# Only the LangChain pieces that are actually used are declared: langchain-core
+# (prompt templates, runnables, the Embeddings interface) and langchain-chroma
+# (the Chroma VectorStore wrapper). The "langchain" meta-package and the
+# deprecated langchain-community imports are deliberately not required.
+langchain-core==1.6.12
+langchain-chroma==1.1.0
+chromadb==1.5.9
+# Local embedding model; downloads all-MiniLM-L6-v2 (~90 MB) on first index build.
+# torch is already pinned above for Whisper and is reused here.
+sentence-transformers==6.1.0
+
+# --- Step 5: report generation and multi-format export ------------------------
+# Every docx/xlsx/pptx/pdf file is produced in memory, so exporting needs no
+# external service, no model call and no extra download.
+reportlab==5.1.0        # PDF (Platypus layout engine)
+python-docx==1.2.0      # editable Word documents
+openpyxl==3.1.5         # Excel workbooks
+python-pptx==1.0.2      # concise presentation export
+
+# --- Tests --------------------------------------------------------------------
+pytest==9.1.1
+pytest-mock==3.16.0
+# Opens the generated PDFs to prove they are real, parseable documents.
+pypdf==6.21.2
